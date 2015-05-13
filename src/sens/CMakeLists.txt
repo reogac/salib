@@ -1,0 +1,24 @@
+add_library(sens OBJECT normal.cpp
+                    dft.cpp
+                    sobol.cpp
+                    SAException.cpp
+                    InputDist.cpp
+                    ModelInput.cpp
+                    ModelOutput.cpp
+                    TimecourseFeatures.cpp
+                    ResultMatrix.cpp
+                    Matrix.cpp
+                    SABase.cpp
+                    SASimple.cpp
+                    SALessSimple.cpp
+                    ModelEvaluator.cpp
+                    KSMethod.cpp
+                    SobolSaltelli.cpp
+                    Morris.cpp
+                    Jansen.cpp
+                    RBD.cpp
+                    DGSM.cpp
+                    FASTBase.cpp
+                    FAST.cpp
+                    EFAST.cpp
+                    RNGWrapper.cpp) 
