@@ -6,9 +6,15 @@ add_library(sim OBJECT ASTNodeOptimizer.cpp
                        EventExecutionList.cpp
                        KineticParameter.cpp
                        MathPrinter.cpp
+                       SimError.cpp
+                       SimException.cpp
                        OdeVariable.cpp
                        OdeStruct.cpp
                        OdeStructBuilder.cpp
+                       InnerSolver.cpp
+                       CvodeSolver1.cpp
+                       SolverData.cpp
+                       Solver.cpp
                        OdeModel.cpp
                        OdeModelEquation.cpp
                        OdeModelEventAssignment.cpp

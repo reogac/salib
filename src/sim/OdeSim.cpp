@@ -133,9 +133,9 @@ OdeSim& OdeSim::setSolverSettings(const SolverSettings* solverSettings)
   /* TODO: we should change if solver settings is valid regarding to the model
    * properties */
   if (solverSettings
-      && solverSettings->getSolverType() == ODE_SOLVER_CVODE )
+      && solverSettings->getType() == ODE_SOLVER_CVODE )
   {
-    m_SolverSettings.reset(new SolverSettings(*solverSettings));
+    m_SolverSettings.reset(solverSettings->clone());
     m_IsSolverChanged = true;
     return *this;
   }
@@ -171,7 +171,7 @@ SolverBase* OdeSim::createSolver()
   assert(m_SolverSettings);
 
   SolverBase* ret(nullptr);
-  switch (m_SolverSettings->getSolverType())
+  switch (m_SolverSettings->getType())
   {
     case ODE_SOLVER_CVODE:
       ret = new CvodeSolver(m_Model);

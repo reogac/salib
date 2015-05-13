@@ -153,7 +153,7 @@ int CvodeSolver::createSolverStructure(const SolverSettings* settings)
 
   const CvodeSettings* cvodeSettings = (const CvodeSettings*) settings;
 
-  double atol = cvodeSettings->getATol();
+  double atol = cvodeSettings->getAError();
   realtype* y = NV_DATA_S(y_);
   realtype* atols = NV_DATA_S(atols_);
   const double* values = m_Helper->getValues();
@@ -174,7 +174,7 @@ int CvodeSolver::createSolverStructure(const SolverSettings* settings)
                   == CV_SUCCESS );
 
   if (success)
-    success = ( CVodeSVtolerances(cvode_, cvodeSettings->getRTol(), atols_) 
+    success = ( CVodeSVtolerances(cvode_, cvodeSettings->getRError(), atols_) 
                   == CV_SUCCESS );
   if (success)
     success = ( CVodeSetUserData(cvode_, m_Helper.get())
@@ -189,7 +189,7 @@ int CvodeSolver::createSolverStructure(const SolverSettings* settings)
     success = ( CVDlsSetDenseJacFn(cvode_, nullptr)
                   == CVDLS_SUCCESS );
   if (success)
-    success = ( CVodeSetMaxNumSteps(cvode_, cvodeSettings->getMaxInternalStep())
+    success = ( CVodeSetMaxNumSteps(cvode_, cvodeSettings->getMaxSteps())
                   == CV_SUCCESS );
   if (success)
     success = ( CVodeRootInit(cvode_, m_Helper->getNumRootFinders(), CvodeHelper::g)

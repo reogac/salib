@@ -1,6 +1,6 @@
 /**
  @file SolverSettings.h
- @brief Base class for configuration of solver
+ @brief 
  @author Thai Quang Tung (tungtq), tungtq@gmail.com
   */
 
@@ -11,27 +11,28 @@
 
 BIO_NAMESPACE_BEGIN
 
-#define ODE_SOLVER_CVODE 0
-#define ODE_SOLVER_LSODE 1
+typedef enum
+{
+  ODE_SOLVER_RK45=0,
+  ODE_SOLVER_CVODE,
+} SolverType_t;
 
 class SolverSettings
 {
   public:
-    SolverSettings(const int type);
+    SolverSettings(const SolverType_t type);
     SolverSettings(const SolverSettings& other);
-    virtual ~SolverSettings();
-
     SolverSettings& operator= (const SolverSettings& other);
-    virtual SolverSettings* clone() const;
+    virtual SolverSettings* clone() const = 0;
 
-    int getSolverType() const;
-
+    void setMaxSteps(const int steps) { m_MaxSteps = steps; }
+    int getMaxSteps() const  { return m_MaxSteps; }
+    int getType() const { return m_Type; }
   protected:
-    int m_SolverType;
+    int m_Type;
+    int m_MaxSteps;
 };
-
 BIO_NAMESPACE_END
 
 #endif   /* ----- #ifndef SolverSettings_INC  ----- */
-
 

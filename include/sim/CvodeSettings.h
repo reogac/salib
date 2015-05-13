@@ -1,6 +1,6 @@
 /**
  @file CvodeSettings.h
- @brief class to keep parameter settings for cvode solver
+ @brief 
  @author Thai Quang Tung (tungtq), tungtq@gmail.com
   */
 
@@ -16,31 +16,19 @@ class CvodeSettings : public SolverSettings
   public:
     CvodeSettings();
     CvodeSettings(const CvodeSettings& other);
-    CvodeSettings* clone() const;
-    
     CvodeSettings& operator= (const CvodeSettings& other);
-    
-    CvodeSettings& setATol(const double atol);
-    double getATol() const;
+    CvodeSettings* clone() const override;
 
-    CvodeSettings& setRTol(const double rtol);
-    double getRTol() const;
-    
-    int getMaxInternalStep() const;
-    CvodeSettings& setMaxInternalStep(const int num);
-
-    int getMaxOrder() const;
-    CvodeSettings& setMaxOrder(const int order);
-
-  protected:
-    double m_ATol;
-    double m_RTol;
-    int m_MaxInternalStep;
-    int m_MaxOrder;
+    void setAError(const double error) { m_AError = error; }    
+    double getAError() const  { return m_AError;}
+    void setRError(const double error) { m_RError = error; }
+    double getRError() const { return m_RError; }
+  private:
+    double m_AError;
+    double m_RError;
 };
 
 BIO_NAMESPACE_END
 
 #endif   /* ----- #ifndef CvodeSettings_INC  ----- */
-
 

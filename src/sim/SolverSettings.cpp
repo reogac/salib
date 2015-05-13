@@ -1,6 +1,6 @@
 /**
  @file SolverSettings.cpp
- @brief Implementation for SolverSettings class
+ @brief 
  @author Thai Quang Tung (tungtq), tungtq@gmail.com
   */
 
@@ -8,36 +8,28 @@
 
 BIO_NAMESPACE_BEGIN
 
-SolverSettings::SolverSettings(const int type)
-  : m_SolverType(type)
-{
-}
-SolverSettings::~SolverSettings()
+SolverSettings::SolverSettings(const SolverType_t type)
+  : m_Type(type)
+  , m_MaxSteps(5000)
 {
 }
 
 SolverSettings::SolverSettings(const SolverSettings& other)
+  : m_Type(other.m_Type)
+  , m_MaxSteps(other.m_MaxSteps)
 {
-  m_SolverType = other.getSolverType();
-}
-
-SolverSettings* SolverSettings::clone() const
-{
-  return new SolverSettings(*this);
 }
 
 SolverSettings& SolverSettings::operator= (const SolverSettings& other)
 {
-  if (this != &other )
+  if (this != &other)
   {
-    m_SolverType = other.m_SolverType;
+    m_Type = other.m_Type;
+    m_MaxSteps = other.m_MaxSteps;
   }
   return *this;
 }
-int SolverSettings::getSolverType() const
-{
-  return m_SolverType;
-}
 
 BIO_NAMESPACE_END
+
 
