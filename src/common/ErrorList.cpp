@@ -8,8 +8,8 @@
 #include <cassert>
 BIO_NAMESPACE_BEGIN
 
-static ErrorMessage OutOfMemoryError(FATAL_OUT_OF_MEMORY, LEVEL_FATAL, "Out of memory");
-static ErrorMessage UnknowError(FATAL_UNKNOWN, LEVEL_FATAL, "Unknown error");
+static ErrorMessage OutOfMemoryError(FATAL_OUT_OF_MEMORY, LEVEL_FATAL);
+static ErrorMessage UnknowError(FATAL_UNKNOWN, LEVEL_FATAL);
 
 ErrorList::ErrorList()
   : m_Valid(true)
@@ -19,9 +19,12 @@ ErrorList::ErrorList()
 
 }
 
-ErrorList::~ErrorList()
+ErrorList::ErrorList(ErrorList&& other)
+  : m_Valid(other.m_Valid)
+  , m_NumErrors(other.m_NumErrors)
+  , m_NumFatals(other.m_NumFatals)
+  , m_Errors(std::move(other.m_Errors))
 {
-
 }
 
 int ErrorList::getNumMessages() const
@@ -56,26 +59,43 @@ const ErrorMessage& ErrorList::getError(const int index) const
 }
 
 
-void ErrorList::add(ErrorMessage*&& message)
+void ErrorList::add(ErrorMessage*&& message) noexcept
 {
-  if (!m_Valid)
+  if (message == nullptr)                       /* getting a null pointer means the message was not allocated */
+  {
+    m_Valid = false;
     return;
+  }
+  if (!m_Valid)
+  {
+    delete message;
+    return;
+  }
   try
   {
-    m_Errors.emplace_back(message);
+    m_Errors.emplace_back(std::move(message));
+    if (m_Errors.back()->getLevel() == LEVEL_ERROR)
+      m_NumErrors++;
+
+    else if (m_Errors.back()->getLevel() == LEVEL_FATAL)
+      m_NumFatals++;
   } catch (std::bad_alloc&)
   {
     m_Valid = false;
   }
 }
-
-void ErrorList::add(std::unique_ptr<ErrorMessage> message)
+void ErrorList::add(std::unique_ptr<ErrorMessage>&& message) noexcept
 {
   if (!m_Valid)
     return;
   try
   {
     m_Errors.emplace_back(std::move(message));
+    if (m_Errors.back()->getLevel() == LEVEL_ERROR)
+      m_NumErrors++;
+
+    else if (m_Errors.back()->getLevel() == LEVEL_FATAL)
+      m_NumFatals++;
   } catch (std::bad_alloc&)
   {
     m_Valid = false;

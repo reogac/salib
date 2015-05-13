@@ -30,12 +30,12 @@ int main()
 //  INFO("info")
 //  WARNING("waning")
 //
-  ErrorList errors;
-  errors.add(new ErrorMessage(1,LEVEL_ERROR, "error"));
-  errors.add(new ErrorMessage(2,LEVEL_FATAL, "fatal"));
-  errors.add(new ErrorMessage(3,LEVEL_WARNING, "warning"));
-  LOG_ERRORS(errors) 
-  VERROR("a message %d", 10)
+//  ErrorList errors;
+//  errors.add(new ErrorMessage(1,LEVEL_ERROR, "error"));
+//  errors.add(new ErrorMessage(2,LEVEL_FATAL, "fatal"));
+//  errors.add(new ErrorMessage(3,LEVEL_WARNING, "warning"));
+//  LOG_ERRORS(errors) 
+//  VERROR("a message %d", 10)
   try {
 //  std::unique_ptr<TestFramework> frm(TestFramework::instance("portfolio"));
   double a[8] = {0,0,99,99,99,99,99,0};

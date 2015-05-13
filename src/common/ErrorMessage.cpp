@@ -8,29 +8,25 @@
 
 BIO_NAMESPACE_BEGIN
 
-ErrorMessage::ErrorMessage(int code, ErrorLevel_t level /* ERROR_ERROR */
-    , std::string msg /* string("") */)
+ErrorMessage::ErrorMessage(int code, ErrorLevel_t level /* ERROR_ERROR */)
   : m_Code(code)
   , m_Level(level)
-  , m_Message(msg)
+  , m_Message(nullptr)
+{ 
+}
+ErrorMessage::ErrorMessage(int code, std::unique_ptr<char[]>&& message, ErrorLevel_t level /* ERROR_ERROR */)
+  : m_Code(code)
+  , m_Level(level)
+  , m_Message(std::move(message))
 {
-
 }
 
-ErrorMessage::~ErrorMessage()
-{  
-}
-
-/* 
-const std::string& ErrorMessage::getMessage() const
-{
-  return m_Message;
-}
-*/
 
 const char* ErrorMessage::getMessage() const
 {
-  return m_Message.c_str();
+  if (m_Message)
+    return m_Message.get();
+  return UnknownErrorString;
 }
 
 int ErrorMessage::getLevel() const
@@ -47,9 +43,9 @@ int ErrorMessage::getCode() const
 void ErrorMessage::write(Logger& logger) const
 {
   if (m_Level == LEVEL_WARNING)
-    logger.write(LOG_WARNING, m_Message.c_str());
+    logger.write(LOG_WARNING, getMessage());
   else
-    logger.write(LOG_ERROR, m_Message.c_str());
+    logger.write(LOG_ERROR, getMessage());
 }
 
 Logger& operator<< (Logger& logger, const ErrorMessage& msg)

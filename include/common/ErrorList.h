@@ -4,6 +4,9 @@
  @author Thai Quang Tung (tungtq), tungtq@gmail.com
   */
 
+#ifndef  ErrorList_INC
+#define  ErrorList_INC
+
 #include <memory>
 #include <vector>
 
@@ -17,8 +20,8 @@ class ErrorList
 {
   public:
     ErrorList();
-    virtual ~ErrorList();
-
+    ErrorList(ErrorList&& other);
+    ErrorList(const ErrorList& other) = delete;
     int getNumMessages() const;
 
     int getNumErrors() const;
@@ -27,8 +30,8 @@ class ErrorList
 
     const ErrorMessage& getError(const int index) const;
 
-    void add(ErrorMessage*&& message);
-    void add(std::unique_ptr<ErrorMessage> message);
+    void add(std::unique_ptr<ErrorMessage>&& message) noexcept;
+    void add(ErrorMessage*&& message) noexcept;
     void clear();
   protected:
     int getNumErrors( const ErrorLevel_t level) const;
@@ -44,3 +47,4 @@ class ErrorList
 
 BIO_NAMESPACE_END
 
+#endif   /* ----- #ifndef ErrorList_INC  ----- */

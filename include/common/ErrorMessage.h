@@ -8,10 +8,9 @@
 #ifndef  ErrorMessage_INC
 #define  ErrorMessage_INC
 
-#include <string>
 
-//#include "namespace.h"
 #include "Logger.h"
+#include "utils.h"
 
 BIO_NAMESPACE_BEGIN
 
@@ -29,18 +28,20 @@ typedef enum {
 class ErrorMessage
 {
   public:
-    ErrorMessage(int code, ErrorLevel_t level = LEVEL_ERROR, std::string msg="");
-    virtual ~ErrorMessage();
+    ErrorMessage(int code, ErrorLevel_t level = LEVEL_ERROR);
+    ErrorMessage(int code, std::unique_ptr<char[]>&&message, ErrorLevel_t level = LEVEL_ERROR);
 
-//  const std::string& getMessage() const;
-  const char* getMessage() const;
+  virtual const char* getMessage() const;
 
   int getLevel() const;
   int getCode() const;
   protected:
     int m_Code;                        /** Error code number */
     int m_Level;                       /** Severity level */
-    std::string m_Message;
+    std::unique_ptr<char[]> m_Message;
+
+    ErrorMessage(const ErrorMessage& other) = delete;
+    ErrorMessage& operator= (const ErrorMessage& other) = delete;
     
   private:
     friend Logger& operator<< (Logger& logger, const ErrorMessage& msg);
