@@ -11,6 +11,8 @@ OdeVariable::OdeVariable(const OdeVariableType_t type)
   , m_Index(-1)
   , m_EqIndex(-1)
   , m_InitEqIndex(-1)
+  , m_Value(0.0)
+  , m_HasValue(false)
 {
 
 }

@@ -43,12 +43,20 @@ class OdeStruct
   protected:
     OdeVariable** m_Variables;
     unsigned int m_NumVariables;  
+
     ASTNode** m_Odes;
     unsigned int m_NumOdes;
+    
     ASTNode** m_Assignments;
     unsigned int m_NumAssignments;
-    ASTNode** m_InitAssignments;
+
+
+    ASTNode** m_AlgEquations;
+    unsigned int m_NumAlgEquations;
+
     unsigned int m_NumInitAssignments;
+    ASTNode** m_InitAssignments;
+
     double m_T0;
   private:
     friend class OdeStructBuilder;

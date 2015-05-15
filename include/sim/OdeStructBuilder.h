@@ -20,21 +20,31 @@ BIO_NAMESPACE_BEGIN
 class OdeStructBuilder
 {
   public:
-    OdeStructBuilder(const Model& model);
+    OdeStructBuilder(const Model& m);
     OdeStruct* build();
   private:
-    std::unique_ptr<OdeVariable> createAssignmentVariable(const std::string& id);
-    std::unique_ptr<OdeVariable> createOdeVariable(const std::string& id);
-    std::unique_ptr<ASTNode> buildRateEquation(const std::string& cId);
-    void setVariableValue(std::unique_ptr<OdeVariable>& variable, const bool hasValue, const double value);
-    void scanAssignments();
-    void transitions2Assignments();
-    OdeStruct* buildStruct();
+    void collectRules();
+    void buildRateRules();
+    void rescanEntities();
+    void addInitAssignments();
+    OdeStruct* buildOdeStruct();
+
+    void addRateRule(const std::string& id, std::unique_ptr<ASTNode> eq);
+    void addAssignment(const std::string& id, std::unique_ptr<ASTNode> eq);
+    OdeVariable* findVariable(const std::string& id);
+    OdeVariable* addParameter(const std::string& id, bool search = false);
+
+    std::unique_ptr<ASTNode> rateFromReactions(const Species* species);
+    std::unique_ptr<ASTNode> mathForSpeciesFromReaction(const SpeciesReference* sref
+                                                        , const char* reactionId
+                                                        , const char* speciesId);
+    
     void printOdeStruct(const OdeStruct* model) const;
     
     std::vector<std::unique_ptr<OdeVariable> > m_Variables;
     std::vector<std::unique_ptr<ASTNode> > m_Odes;
     std::vector<std::unique_ptr<ASTNode> > m_Assignments;
+    std::vector<std::unique_ptr<ASTNode> > m_AlgEquations;
     std::vector<std::unique_ptr<ASTNode> > m_InitAssignments;
 
     ErrorList m_Errors;

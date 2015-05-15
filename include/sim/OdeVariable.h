@@ -32,12 +32,14 @@ class OdeVariable
     bool hasInitAssignment() const  { return m_InitEqIndex>=0; }
     const std::string& getName() const  { return m_Name; }
     double getValue() const { return m_Value; }
+    void setValue(const double v) { m_Value = v; m_HasValue = true; }
   protected:
     int m_Type;
     int m_Index;                                /* variable index */
     int m_EqIndex;                              /* equation index */
     int m_InitEqIndex;                          /* init equation index */
     double m_Value;                             /* constant value or initialized value */
+    bool m_HasValue;                            /* does the variable have a set value */
     
     std::string m_Name;                         /* an unique name */
   private:

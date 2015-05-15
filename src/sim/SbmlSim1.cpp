@@ -11,15 +11,17 @@
 #include "CvodeSettings.h"
 //#include "SimResultRecorder.h"
 
+#include <sbml/SBMLTypes.h>
 #include <iostream>
 #include <iomanip>
 
 BIO_NAMESPACE_BEGIN
 
-SbmlSim1::SbmlSim1(const Model& model)
-  : m_Model(model)
+SbmlSim1::SbmlSim1()
+  : m_Sbml(nullptr)
+  , m_OdeStruct(nullptr)
+  , m_Solver(nullptr)
   , m_Settings(new CvodeSettings())
-  , m_Status(SIM_NOT_READY)
   , m_CurrentStep(0)
   , m_NumSteps(100)
   , m_Times(new double [m_NumSteps+1])
@@ -30,34 +32,44 @@ SbmlSim1::SbmlSim1(const Model& model)
     m_Times[i] = i*5;
 }
 
+void SbmlSim1::loadSbml(const char* filename)
+{
+  SBMLReader reader;
+  m_Sbml.reset(reader.readSBMLFromFile(filename));
+  if (m_Sbml->getNumErrors() == 0)
+  {
+    if (m_Sbml->getLevel() <=2) 
+    {//try to convert to level 2 version 4 Sbml format
+      m_Sbml->setConsistencyChecksForConversion( LIBSBML_CAT_UNITS_CONSISTENCY, false);
+      m_Sbml->setConsistencyChecksForConversion( LIBSBML_CAT_SBO_CONSISTENCY, false);
+
+      if (m_Sbml->checkL2v4Compatibility() == 0)
+        m_Sbml->setLevelAndVersion(2,4);
+    }
+  }
+
+  if (m_Sbml->getNumErrors() >0)
+  {
+    //TODO: throw an exception
+  }
+}
+
 void SbmlSim1::initialize()
 {
-  m_Status = SIM_NOT_READY;
-
-  if (!m_OdeStruct
-      || m_VaryingFlag)                         /* needs to build ode structures */
+  if (!m_Sbml)
   {
-    OdeStructBuilder builder(m_Model);
-    m_OdeStruct.reset(builder.build());
-    m_Solver.reset(new Solver(m_Settings.get()));//solver has to be reset
-    m_Solver->initialize(m_OdeStruct.get());
-  } else if (m_SettingsFlag)                    /* solver settings were changed*/
-  {
-    m_Solver->reset(m_Settings.get());
-  } else if (m_TimeFlag)                        /* simulation time was change */
-  {
-    m_Solver->reset();
+    //throw an exception
   }
+
+  OdeStructBuilder builder(*(m_Sbml->getModel()));
+  m_OdeStruct.reset(builder.build());
+  m_Solver.reset(new Solver(m_Settings.get()));
+  m_Solver->initialize(m_OdeStruct.get());
   m_CurrentStep = 0;
-  m_Status = SIM_READY;
 }
 
 void SbmlSim1::setTime(const std::vector<double>& time)
 {
-  if (m_Status != SIM_NOT_READY
-      && m_Status != SIM_DONE)
-    throw SimException(SIM_SOLVER_BUSY);
-
   if (time.size() == 0)
     throw SimException(SIM_EMPTY_TIMEPOINT);
 
@@ -72,18 +84,11 @@ void SbmlSim1::setTime(const std::vector<double>& time)
   }
   m_Times = std::move(ts);
   m_NumSteps = time.size();
-
-  if (m_Status != SIM_NOT_READY)
-    m_TimeFlag = true;
 }
 
 
 void SbmlSim1::setTime(const double duration, const int numSteps)
 {
-  if (m_Status != SIM_NOT_READY
-      && m_Status != SIM_DONE)
-    throw SimException(SIM_SOLVER_BUSY);
-
   if (duration<=0)
      throw SimException(SIM_INVALID_TIME_DURATION);
   if (numSteps <=0)
@@ -97,67 +102,35 @@ void SbmlSim1::setTime(const double duration, const int numSteps)
   ts[numSteps] = duration;
   m_Times = std::move(ts);
   m_NumSteps = numSteps;
-
-  if (m_Status != SIM_NOT_READY)
-    m_TimeFlag = true;
 }
 
 void SbmlSim1::setSolverSettings(std::unique_ptr<SolverSettings>&& settings)
 {
-  if (m_Status != SIM_NOT_READY
-      && m_Status != SIM_DONE)
-    throw SimException(SIM_SOLVER_BUSY);
-
   m_Settings = std::move(settings);
-
-  if (m_Status != SIM_NOT_READY)
-    m_SettingsFlag = true;
 }
 
 void SbmlSim1::setSolverSettings(const SolverSettings& settings)
 {
-  if (m_Status != SIM_NOT_READY
-      && m_Status != SIM_DONE)
-    throw SimException(SIM_SOLVER_BUSY);
-
   m_Settings.reset(settings.clone());
-
-  if (m_Status != SIM_NOT_READY)
-    m_SettingsFlag = true;
 }
 
 
 void SbmlSim1::setVaryingVariables(std::vector<std::string>& variables)
 {
-  if (m_Status != SIM_NOT_READY
-      && m_Status != SIM_DONE)
-    throw SimException(SIM_SOLVER_BUSY);
-
-  if (m_Status != SIM_NOT_READY)
-    m_VaryingFlag = true;
-
 }
 bool SbmlSim1::isDone() const
 {
-  return m_Status == SIM_DONE;
+  return (m_CurrentStep == m_NumSteps);
 }
 
 void SbmlSim1::simulateOne()
 {
-  if (m_Status != SIM_READY)
-    throw SimException(SIM_SOLVER_NOT_READY);
-
   m_Solver->solve(m_Times[m_CurrentStep+1]);
   m_CurrentStep++;
-  if (m_CurrentStep == m_NumSteps)
-    m_Status = SIM_DONE;
 }
 
 void SbmlSim1::simulate()
 {
-  if (m_Status != SIM_READY)
-    throw SimException(SIM_SOLVER_NOT_READY);
-  
   //m_Results.reset(new SimResults(m_Model, m_Times.get(), m_NumSteps+1));
   //SimResultRecorder recorder(m_Results.get(), m_OdeStruct.get());
 
@@ -172,7 +145,6 @@ void SbmlSim1::simulate()
     //recorder.record(values, m_CurrentStep);
   }
 
-  m_Status = SIM_DONE;
   //std::cout << *m_Results;
 }
 
@@ -180,14 +152,12 @@ void SbmlSim1::reset()
 {
   m_Solver->reset();
   m_CurrentStep = 0;
-  m_Status = SIM_READY;
 }
 
 void SbmlSim1::reset(const double* values)
 {
   m_Solver->reset(m_VaryingVariableIndexes, values);
   m_CurrentStep = 0;
-  m_Status = SIM_READY;
 }
 void SbmlSim1::printResults(const double* values)
 {

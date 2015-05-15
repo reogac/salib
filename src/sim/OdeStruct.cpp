@@ -18,6 +18,10 @@ OdeStruct::OdeStruct()
   , m_NumOdes(0)
   , m_Assignments(nullptr)
   , m_NumAssignments(0)
+  , m_NumAlgEquations(0)
+  , m_AlgEquations(nullptr)
+  , m_NumInitAssignments(0)
+  , m_InitAssignments(nullptr)
   , m_T0(0.0)
 {
 }
@@ -35,6 +39,15 @@ OdeStruct::~OdeStruct()
   for (unsigned int i=0; i<m_NumAssignments; ++i)
     delete m_Assignments[i];
   delete [] m_Assignments;
+
+  for (unsigned int i=0; i<m_NumAlgEquations; ++i)
+    delete m_AlgEquations[i];
+  delete [] m_AlgEquations;
+
+  for (unsigned int i=0; i<m_NumInitAssignments; ++i)
+    delete m_InitAssignments[i];
+  delete [] m_InitAssignments;
+
 }
 
 void OdeStruct::index(ASTNode* math)

@@ -20,19 +20,10 @@
 
 BIO_NAMESPACE_BEGIN
 
-enum
-{
-  SIM_NOT_READY=0,
-  SIM_READY,
-  SIM_DOING,
-  SIM_DONE
-} SimStatus_t;
-
-
 class SbmlSim1
 {
   public:
-    SbmlSim1(const Model& model);
+    SbmlSim1();
     
     void setTime(const std::vector<double>& times);
     void setTime(const double duration, const int numSteps);
@@ -40,13 +31,13 @@ class SbmlSim1
     void setSolverSettings(const SolverSettings& settings);
     void setVaryingVariables(std::vector<std::string>& variables);
        
+    void loadSbml(const char* filename);
     void initialize();
     void simulate();
     void simulateOne();
     void reset();
     void reset(const double* values);
     bool isDone() const;
-  protected:
   private:
     void printResults(const double* values);
 
@@ -55,16 +46,11 @@ class SbmlSim1
     std::unique_ptr<double []> m_Times;
     int m_NumSteps;
     std::unique_ptr<Solver> m_Solver;
-    const Model& m_Model;
     std::unique_ptr<SolverSettings> m_Settings;
     std::vector<int> m_VaryingVariableIndexes;
     std::unique_ptr<OdeStruct>  m_OdeStruct;
-
+    std::unique_ptr<SBMLDocument> m_Sbml;
 //    std::unique_ptr<SimResults> m_Results;
-
-    bool m_TimeFlag;
-    bool m_SettingsFlag;
-    bool m_VaryingFlag;
 };
 
 BIO_NAMESPACE_END

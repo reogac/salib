@@ -10,6 +10,8 @@
 #include "sim/SbmlOdeModel.h"
 #include "sim/SbmlSim.h"
 #include "sim/SolverException.h"
+#include "sim/OdeStructBuilder.h"
+#include "sim/OdeStruct.h"
 
 #include "sens/RNGWrapper.h"
 
@@ -29,12 +31,21 @@ void test_rng()
 
 int main(int argc, const char** argv)
 {
-  test_rng();
+//  test_rng();
 
   if (argc != 2) {
     std::cout << "Usage: " << argv[0] << " model-file" << std::endl;
     return EXIT_SUCCESS;
   }
+
+//  OdeStructBuilder ob;
+//  OdeStruct* odes = ob.loadSbml(argv[1]);
+//  delete odes;
+  
+
+  return EXIT_SUCCESS;
+
+
 
   std::set<int> vars{};
   SbmlOdeModel model;

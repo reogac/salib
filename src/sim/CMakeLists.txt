@@ -15,6 +15,7 @@ add_library(sim OBJECT ASTNodeOptimizer.cpp
                        CvodeSolver1.cpp
                        SolverData.cpp
                        Solver.cpp
+                       SbmlSim1.cpp
                        OdeModel.cpp
                        OdeModelEquation.cpp
                        OdeModelEventAssignment.cpp
