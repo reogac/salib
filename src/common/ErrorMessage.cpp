@@ -11,21 +11,21 @@ BIO_NAMESPACE_BEGIN
 ErrorMessage::ErrorMessage(int code, ErrorLevel_t level /* ERROR_ERROR */)
   : m_Code(code)
   , m_Level(level)
-  , m_Message(nullptr)
 { 
 }
-ErrorMessage::ErrorMessage(int code, std::unique_ptr<char[]>&& message, ErrorLevel_t level /* ERROR_ERROR */)
+
+ErrorMessage::ErrorMessage(int code, const std::string& message, ErrorLevel_t level /* ERROR_ERROR */)
   : m_Code(code)
   , m_Level(level)
-  , m_Message(std::move(message))
+  , m_Message(message)
 {
 }
 
 
 const char* ErrorMessage::getMessage() const
 {
-  if (m_Message)
-    return m_Message.get();
+  if (!m_Message.empty())
+    return m_Message.c_str();
   return UnknownErrorString;
 }
 

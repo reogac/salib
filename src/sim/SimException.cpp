@@ -10,13 +10,12 @@ BIO_NAMESPACE_BEGIN
 
 static SimExceptionMessage_t SimExceptionTable[SIM_NUM_EXCEPTIONS] = 
 {
-  { SIM_SOLVER_BUSY, "Solver is busy"},
-  { SIM_SOLVER_NOT_READY, "Solver is not ready (not initialized)"},
-  { SIM_EMPTY_TIMEPOINT, "Provide at least one time point"},
-  { SIM_INVALID_TIMEPOINT, "Found a invalid timepoint (timepoints must be in strict ascending order"},
-  { SIM_INVALID_TIME_DURATION, "Invalid time duration" },
-  { SIM_INVALID_NUM_TIMESTEPS, "Invalid number of timesteps"},
-  { SIM_UNKNOWN, "An unknown error"},
+  { SIM_EXCEPTION_NO_MODEL, "Input model has not been loaded"},
+  { SIM_EXCEPTION_NO_TIMEPOINT, "Provide at least one time point"},
+  { SIM_EXCEPTION_INVALID_TIMEPOINT, "Found a invalid timepoint (timepoints must be in strict ascending order"},
+  { SIM_EXCEPTION_INVALID_TIME_DURATION, "Invalid time duration" },
+  { SIM_EXCEPTION_INVALID_NUM_TIMESTEPS, "Invalid number of timesteps"},
+  { SIM_EXCEPTION_UNKNOWN, "An unknown error"},
 };
 
 
@@ -25,8 +24,8 @@ SimException::SimException(const int code)
 {
 }
 
-SimException::SimException(const int code, std::unique_ptr<char[]>&& message)
-  : Exception(code, std::move(message))
+SimException::SimException(const int code, const std::string& message)
+  : Exception(code, message)
 {
 }
 SimException::SimException(SimException&& other)
@@ -36,12 +35,13 @@ SimException::SimException(SimException&& other)
 
 const char* SimException::what() const noexcept
 {
-  if (m_Message)
-    return m_Message.get();
+  if (!m_Message.empty())
+    return m_Message.c_str();
   if (m_Code>=0 && m_Code<SIM_NUM_EXCEPTIONS)
     return  SimExceptionTable[m_Code].message_;
   return UnknownErrorString;
 }
+
 BIO_NAMESPACE_END
 
 

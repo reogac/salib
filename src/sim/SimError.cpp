@@ -13,13 +13,13 @@ SimError::SimError(const int code, ErrorLevel_t level)
 {
 }
 
-SimError::SimError(int code, std::unique_ptr<char[]>&&message, ErrorLevel_t level)
-  : ErrorMessage(code, std::move(message), level)
+SimError::SimError(int code, const std::string& message, ErrorLevel_t level)
+  : ErrorMessage(code, message, level)
 {
 }
 const char* SimError::getMessage() const
 {
-  return m_Message.get();
+  return m_Message.c_str();
 }
 BIO_NAMESPACE_END
 

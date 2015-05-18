@@ -11,20 +11,19 @@ BIO_NAMESPACE_BEGIN
 
 Exception::Exception(const int code)
   : m_Code(code)
-  , m_Message(nullptr)
 {
 }
 
-Exception::Exception(const int code, std::unique_ptr<char[]>&& message)
+Exception::Exception(const int code, const std::string& message)
   : m_Code(code)
-  , m_Message(std::move(message))
+  , m_Message(message)
 {
 }
 
 Exception::Exception(Exception&& other)
   : std::exception(std::move(other))
   , m_Code(other.m_Code)
-  , m_Message(std::move(other.m_Message))
+  , m_Message(other.m_Message)
 { 
 }
 

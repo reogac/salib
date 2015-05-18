@@ -9,6 +9,7 @@
 #include "OdeStructBuilder.h"
 #include "SimException.h"
 #include "CvodeSettings.h"
+#include "SimError.h"
 //#include "SimResultRecorder.h"
 
 #include <sbml/SBMLTypes.h>
@@ -21,17 +22,18 @@ SbmlSim1::SbmlSim1()
   : m_Sbml(nullptr)
   , m_OdeStruct(nullptr)
   , m_Solver(nullptr)
-  , m_Settings(new CvodeSettings())
+  , m_Settings()
   , m_CurrentStep(0)
-  , m_NumSteps(100)
-  , m_Times(new double [m_NumSteps+1])
+  , m_Times()
  // , m_Results(nullptr)
 {
-  //create default timepoints
-  for (unsigned int i=0; i<=m_NumSteps; ++i)
-    m_Times[i] = i*5;
+  defaults();
 }
-
+void SbmlSim1::defaults()
+{
+  m_Settings.reset(new CvodeSettings());
+  setTime(100.0, 10);
+}
 void SbmlSim1::loadSbml(const char* filename)
 {
   SBMLReader reader;
@@ -50,6 +52,12 @@ void SbmlSim1::loadSbml(const char* filename)
 
   if (m_Sbml->getNumErrors() >0)
   {
+    ErrorList errors;
+    for (int i=0; i<m_Sbml->getNumErrors(); ++i)
+    {
+      errors.add(new SimError(SIM_ERROR_SBML_PARSING, m_Sbml->getError(i)->getMessage()));
+    }
+    throw errors;
     //TODO: throw an exception
   }
 }
@@ -58,7 +66,7 @@ void SbmlSim1::initialize()
 {
   if (!m_Sbml)
   {
-    //throw an exception
+    throw SimException(SIM_EXCEPTION_NO_MODEL);
   }
 
   OdeStructBuilder builder(*(m_Sbml->getModel()));
@@ -71,7 +79,7 @@ void SbmlSim1::initialize()
 void SbmlSim1::setTime(const std::vector<double>& time)
 {
   if (time.size() == 0)
-    throw SimException(SIM_EMPTY_TIMEPOINT);
+    throw SimException(SIM_EXCEPTION_NO_TIMEPOINT);
 
   //set time here
   std::unique_ptr<double []> ts(new double[time.size()+1]);
@@ -79,7 +87,7 @@ void SbmlSim1::setTime(const std::vector<double>& time)
   for (int i=0; i< time.size(); ++i)
   {
     if (time[i] <= ts[i] )
-      throw SimException(SIM_INVALID_TIMEPOINT);
+      throw SimException(SIM_EXCEPTION_INVALID_TIMEPOINT);
     ts[i+1] = time[i];
   }
   m_Times = std::move(ts);
@@ -90,9 +98,9 @@ void SbmlSim1::setTime(const std::vector<double>& time)
 void SbmlSim1::setTime(const double duration, const int numSteps)
 {
   if (duration<=0)
-     throw SimException(SIM_INVALID_TIME_DURATION);
+     throw SimException(SIM_EXCEPTION_INVALID_TIME_DURATION);
   if (numSteps <=0)
-    throw SimException(SIM_INVALID_NUM_TIMESTEPS);
+    throw SimException(SIM_EXCEPTION_INVALID_NUM_TIMESTEPS);
   
   std::unique_ptr<double[]> ts(new double[numSteps+1]);
   double interval = duration/numSteps;
@@ -137,11 +145,12 @@ void SbmlSim1::simulate()
   const double* values = m_Solver->getValues();
   const double* times = m_Times.get();
   //recorder.record(values, m_CurrentStep);
-
+  printResults(values);
   while( m_CurrentStep<m_NumSteps )
   {
     m_Solver->solve(times[m_CurrentStep+1]);
     m_CurrentStep++;
+    printResults(values);
     //recorder.record(values, m_CurrentStep);
   }
 

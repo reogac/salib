@@ -24,6 +24,7 @@ class SbmlSim1
 {
   public:
     SbmlSim1();
+    void defaults();
     
     void setTime(const std::vector<double>& times);
     void setTime(const double duration, const int numSteps);
@@ -41,10 +42,9 @@ class SbmlSim1
   private:
     void printResults(const double* values);
 
-    int m_Status;
     int m_CurrentStep;
-    std::unique_ptr<double []> m_Times;
     int m_NumSteps;
+    std::unique_ptr<double []> m_Times;
     std::unique_ptr<Solver> m_Solver;
     std::unique_ptr<SolverSettings> m_Settings;
     std::vector<int> m_VaryingVariableIndexes;

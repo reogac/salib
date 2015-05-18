@@ -22,7 +22,7 @@ class Exception : public std::exception
 {
   public:
     Exception(const int code);
-    Exception(const int code, std::unique_ptr<char[]>&& message);
+    Exception(const int code, const std::string& message);
     Exception(Exception&& other);
 
   protected:
@@ -30,7 +30,7 @@ class Exception : public std::exception
     Exception& operator= (const Exception& other) = delete;
 
     int m_Code;
-    std::unique_ptr<char[]> m_Message;
+    const std::string m_Message;
 };
 
 

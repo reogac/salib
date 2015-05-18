@@ -69,10 +69,15 @@ OdeStructBuilder::OdeStructBuilder(const Model& m)
 
 OdeStruct* OdeStructBuilder::build()
 {
+  std::cout << "collect rules\n";
   collectRules();
+  std::cout << "build rules\n";
   buildRateRules();
+  std::cout << "rescan entities\n";
   rescanEntities();
+  std::cout << "add init assignents\n";
   addInitAssignments();
+  std::cout << "build Ode structs\n";
   return buildOdeStruct();
 }
 
@@ -520,7 +525,7 @@ OdeStruct* OdeStructBuilder::buildOdeStruct()
   m_Assignments.clear();
   m_InitAssignments.clear();
   odeStruct->index();
-  printOdeStruct(odeStruct.get());
+  //printOdeStruct(odeStruct.get());
   return odeStruct.release();
 }
 
@@ -555,6 +560,7 @@ void OdeStructBuilder::printOdeStruct(const OdeStruct* model) const
     }
   }
 }
+
 BIO_NAMESPACE_END
 
 

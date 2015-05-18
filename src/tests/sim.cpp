@@ -9,10 +9,13 @@
 #include "common/CommonDefs.h"
 #include "sim/SbmlOdeModel.h"
 #include "sim/SbmlSim.h"
+#include "sim/SbmlSim1.h"
 #include "sim/SolverException.h"
 #include "sim/OdeStructBuilder.h"
 #include "sim/OdeStruct.h"
-
+#include "common/ErrorList.h"
+#include "sim/SimException.h"
+#include "sim/SolverException.h"
 #include "sens/RNGWrapper.h"
 
 using namespace reo;
@@ -33,7 +36,7 @@ int main(int argc, const char** argv)
 {
 //  test_rng();
 
-  if (argc != 2) {
+  if (argc != 4) {
     std::cout << "Usage: " << argv[0] << " model-file" << std::endl;
     return EXIT_SUCCESS;
   }
@@ -41,11 +44,36 @@ int main(int argc, const char** argv)
 //  OdeStructBuilder ob;
 //  OdeStruct* odes = ob.loadSbml(argv[1]);
 //  delete odes;
+   
+  try
+  {
+    SbmlSim1 sim;
+    double dur = atof(argv[2]);
+    int steps = atoi(argv[3]);
+    sim.loadSbml(argv[1]);
+
+    sim.setTime(dur,steps);
+    sim.initialize();
+    sim.simulate();
+    std::cout << "Done!!!";
+  }
+  catch (ErrorList& errors)
+  {
+    LOG_ERRORS(errors)
+  }
+  catch (SimException& e)
+  {
+    std::cout << e.what() << std::endl;
+  }
+  catch (std::exception& e)
+  {
+    std::cout << e.what() << std::endl;
+  }
   
 
   return EXIT_SUCCESS;
 
-
+/*
 
   std::set<int> vars{};
   SbmlOdeModel model;
@@ -81,8 +109,7 @@ int main(int argc, const char** argv)
     std::cout << "\nSimulation Done!\n";
   }
 
-
-
   return EXIT_SUCCESS;
+  */
 }
 

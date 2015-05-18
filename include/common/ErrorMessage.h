@@ -29,7 +29,7 @@ class ErrorMessage
 {
   public:
     ErrorMessage(int code, ErrorLevel_t level = LEVEL_ERROR);
-    ErrorMessage(int code, std::unique_ptr<char[]>&&message, ErrorLevel_t level = LEVEL_ERROR);
+    ErrorMessage(int code, const std::string& message, ErrorLevel_t level = LEVEL_ERROR);
 
   virtual const char* getMessage() const;
 
@@ -38,7 +38,7 @@ class ErrorMessage
   protected:
     int m_Code;                        /** Error code number */
     int m_Level;                       /** Severity level */
-    std::unique_ptr<char[]> m_Message;
+    const std::string m_Message;
 
     ErrorMessage(const ErrorMessage& other) = delete;
     ErrorMessage& operator= (const ErrorMessage& other) = delete;
