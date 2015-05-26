@@ -10,7 +10,7 @@
 #include "SimException.h"
 #include "CvodeSettings.h"
 #include "SimError.h"
-//#include "SimResultRecorder.h"
+#include "SimResultRecorder.h"
 
 #include <sbml/SBMLTypes.h>
 #include <iostream>
@@ -25,7 +25,7 @@ SbmlSim1::SbmlSim1()
   , m_Settings()
   , m_CurrentStep(0)
   , m_Times()
- // , m_Results(nullptr)
+  , m_Results(nullptr)
 {
   defaults();
 }
@@ -58,7 +58,6 @@ void SbmlSim1::loadSbml(const char* filename)
       errors.add(new SimError(SIM_ERROR_SBML_PARSING, m_Sbml->getError(i)->getMessage()));
     }
     throw errors;
-    //TODO: throw an exception
   }
 }
 
@@ -139,22 +138,22 @@ void SbmlSim1::simulateOne()
 
 void SbmlSim1::simulate()
 {
-  //m_Results.reset(new SimResults(m_Model, m_Times.get(), m_NumSteps+1));
-  //SimResultRecorder recorder(m_Results.get(), m_OdeStruct.get());
+  m_Results.reset(new SimResults(*(m_Sbml->getModel()), m_Times.get(), m_NumSteps+1));
+  SimResultRecorder recorder(m_Results.get(), m_OdeStruct.get());
 
   const double* values = m_Solver->getValues();
   const double* times = m_Times.get();
-  //recorder.record(values, m_CurrentStep);
-  printResults(values);
+  recorder.record(values, m_CurrentStep);
+ // printResults(values);
   while( m_CurrentStep<m_NumSteps )
   {
     m_Solver->solve(times[m_CurrentStep+1]);
     m_CurrentStep++;
-    printResults(values);
-    //recorder.record(values, m_CurrentStep);
+//    printResults(values);
+    recorder.record(values, m_CurrentStep);
   }
 
-  //std::cout << *m_Results;
+  std::cout << *m_Results;
 }
 
 void SbmlSim1::reset()

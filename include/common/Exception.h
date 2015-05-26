@@ -12,8 +12,7 @@
 #include "utils.h"
 
 #include <stdexcept>
-#include <memory>
-
+#include <sstream>
 
 BIO_NAMESPACE_BEGIN
 

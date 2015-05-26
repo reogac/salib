@@ -5,7 +5,7 @@
   */
 #include "OdeStruct.h"
 
-//#include "SimException.h"
+#include "SimException.h"
 
 #include <cstring>
 
@@ -89,9 +89,9 @@ int OdeStruct::getVariableIndex(const std::string& name) const
     if (name == m_Variables[iV]->getName())
       return m_Variables[iV]->getIndex();
   }
-  //TODO: add SimException class
-  //throw SimException(SIM_VARIABLE_NOT_FOUND
-  //    , formatMessage("'%s' has not been defined in the model", name.c_str()));
+  std::ostringstream strstr;
+  strstr << name << " has not been defined in the model";
+  throw SimException(SIM_EXCEPTION_VARIABLE_NOT_FOUND, strstr.str());
 }
 
 BIO_NAMESPACE_END

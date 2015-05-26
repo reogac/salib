@@ -38,10 +38,12 @@ SolverData::SolverData(ErrorList& errors)
 {
   //initialize internal data structure
 }
+
 const double* SolverData::getValues() const
 {
   return m_Values;
 }
+
 void SolverData::initialize(const OdeStruct* model)
 {
   m_Model = model;
@@ -123,8 +125,9 @@ void SolverData::update(const double time)
       m_EvalStatus[iV] = EVAL_DOING;
       if (variable->getType() == ODE_ASSIGNMENT_VARIABLE)
         m_Values[iV] = evaluate(m_Model->getAssignment(variable->getEqIndex()));
-      else                                      /* it must be a initial assignment */        
+      else                                      /* it must be a initial assignment */    
         m_Values[iV] = evaluate(m_Model->getInitAssignment(variable->getInitEqIndex()));
+      
       m_EvalStatus[iV] = EVAL_DONE;
     }
   }

@@ -10,7 +10,7 @@
 #include "OdeStruct.h"
 #include "Solver.h"
 #include "SimException.h"
-//#include "SimResults.h"
+#include "SimResults.h"
 
 #include "common/ErrorList.h"
 #include <sbml/Model.h>
@@ -50,7 +50,7 @@ class SbmlSim1
     std::vector<int> m_VaryingVariableIndexes;
     std::unique_ptr<OdeStruct>  m_OdeStruct;
     std::unique_ptr<SBMLDocument> m_Sbml;
-//    std::unique_ptr<SimResults> m_Results;
+    std::unique_ptr<SimResults> m_Results;
 };
 
 BIO_NAMESPACE_END
