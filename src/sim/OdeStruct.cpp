@@ -10,6 +10,26 @@
 #include <cstring>
 
 BIO_NAMESPACE_BEGIN
+OdeStruct::EventAssignment::EventAssignment(const int  varId, const ASTNode* assignment)
+  : varId_(varId)
+  , assignments_(nullptr)
+{
+}
+
+OdeStruct::EventAssignment::~EventAssignment()
+{
+  delete assignment_;
+}
+OdeStruct::EventStruct::EventStruct()
+  : 
+{
+
+}
+
+OdeStruct::EventStruct::~EventStruct()
+{
+
+}
 
 OdeStruct::OdeStruct()
   : m_Variables(nullptr)
@@ -84,6 +104,12 @@ void OdeStruct::index()
 
 int OdeStruct::getVariableIndex(const std::string& name) const
 {
+
+
+
+
+
+
   for (int iV=0; iV< m_NumVariables; ++iV)
   {
     if (name == m_Variables[iV]->getName())

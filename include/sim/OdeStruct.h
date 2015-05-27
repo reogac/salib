@@ -40,7 +40,37 @@ class OdeStruct
     void index();
     void index(ASTNode* math);
 
-  protected:
+  private:
+    friend class OdeStructBuilder;
+
+    class EventAssignment {
+      public:
+        EventAssignment(const int varId, const ASTNode* assignment);
+        ~EventAssignment();
+      private:
+        ASTNode* assignment_;
+        int variableId_;
+        friend class OdeStructBuilder;
+    };
+
+    class EventStruct
+    {
+      public:  
+        EventStruct();
+        ~EventStruct();
+      private:
+        ASTNode* m_Trigger;
+        ASTNode* m_Delay;
+        ASTNode* m_Priority;
+        EventAssignment** m_Assignments;
+        unsigned int m_NumAssignments;
+
+        bool m_InitValue;
+        bool m_Persist;
+        bool m_EvaluateNow;
+        friend class OdeStructBuilder;
+    };
+
     OdeVariable** m_Variables;
     unsigned int m_NumVariables;  
 
@@ -58,9 +88,8 @@ class OdeStruct
     ASTNode** m_InitAssignments;
 
     double m_T0;
-  private:
-    friend class OdeStructBuilder;
-};
+
+    };
 
 BIO_NAMESPACE_END
 
